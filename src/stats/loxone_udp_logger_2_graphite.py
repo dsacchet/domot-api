@@ -3,10 +3,14 @@
 
 import socket
 import sys
+import struct
 from threading import Thread
 from datetime import datetime
 import pprint
 import time
+from carbon.util import pickle
+
+# Mapping entre les intitules envoyes par le loxone et les "path" graphique
 
 metrics_mapping = {
         'Puissance Baie Info':'compteurs.electricite.puissance.ec1',
@@ -38,13 +42,21 @@ metrics_mapping = {
         'SM.5.2.10.Rayonnement global':'compteurs.station_meteo.rayonnement_global'
 }
 
-UDP_IP="192.168.3.254"
-UDP_PORT=1234
+# Socket pour la reception des metriques depuis le loxone
+RECEIVER_UDP_IP="192.168.3.254"
+RECEIVER_UDP_PORT=1234
+
+# Port pickle TCP du serveur carbon
+CARBON_SERVER_PICKLE_ADDRESS='127.0.0.1'
+CARBON_SERVER_PICKLE_PORT=2004
+
+# Interval de flush des valeurs
 interval=60
 
+# Tampon pour les valeurs
 buckets={}
 
-pp = pprint.PrettyPrinter(indent=4)
+# Thread de reception des metriques
 
 class Receiver(Thread):
 
@@ -55,7 +67,7 @@ class Receiver(Thread):
         global buckets
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind((UDP_IP, UDP_PORT))
+        sock.bind((RECEIVER_UDP_IP, RECEIVER_UDP_PORT))
 
         while True:
             data,addr = sock.recvfrom(1024)
@@ -77,6 +89,8 @@ class Receiver(Thread):
                     else:
                         buckets[bucket_start][metric].append(value)
 
+# Thread de publication des metriques
+
 class Publisher(Thread):
 
     def __init__(self):
@@ -85,27 +99,47 @@ class Publisher(Thread):
     def run(self):
         global buckets
         last_values={}
+        sock = socket.socket()
+        sock.connect((CARBON_SERVER_PICKLE_ADDRESS,CARBON_SERVER_PICKLE_PORT))
+
         while True:
-            time.sleep(30)
+            time.sleep(5)
+
+            # On recupere la liste de bucket et on supprime le dernier
             list_buckets=buckets.keys()
+            if len(list_buckets) == 0:
+                next
             list_buckets.pop()
+            # Pour chaque bucket restant
             for bucket in list_buckets:
                 current_bucket = buckets[bucket]
+                # On calcule min/avg/max de chaque metrique qu'il contient et on met a jour last_values
                 for metric in current_bucket:
                     list_metrics=current_bucket[metric]
                     min_value=min(list_metrics)
                     avg_value=sum(list_metrics)/len(list_metrics)
                     max_value=max(list_metrics)
                     last_values[metric]={ 'min':min_value, 'avg':avg_value,'max':max_value }
+                # On publie last_values sur graphite via le protocole pickel
+                graphite_data=[]
                 for metric in last_values:
                     for x in ['min','avg','max']:
-                        print '[PUBLISHER] %s.%s %0.1f %d'%(metric,x,last_values[metric][x],bucket)
+                        path='%s.%s'%(metric,x)
+                        timestamp=bucket
+                        value=last_values[metric][x]
+                        graphite_data.append([path,[timestamp,value]])
+                        print '[PUBLISHER] %s %0.1f %d'%(path,value,timestamp)
+
+                payload = pickle.dumps(graphite_data, protocol=2)
+                header = struct.pack("!L",len(payload))
+                message = header + payload
+                sock.sendall(message)
+                # On supprime le bucket pour qu'il ne soit pas retraite
                 del buckets[bucket]
 
 receiver = Receiver()
 publisher = Publisher()
 receiver.start()
 publisher.start()
-
 receiver.join()
 publisher.join()
