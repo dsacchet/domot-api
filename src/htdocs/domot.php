@@ -1,12 +1,18 @@
 <?php
 
+function getConf($namespace,$value) {
+	include($_SERVER['DOCUMENT_ROOT'].'/../conf/conf.php');
+	return $$value;
+}
+
+
 function postMaisonMetrics($params) {
 	error_reporting(E_ALL);
 	error_log(serialize($params));
 }
 
 function getMaisonVmcMode($params) {
-	$_result=exec('/usr/bin/python /var/www/handlers/airflow_get.py');
+	$_result=exec($_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.$vmc_provider.'/mode/get');
 	echo '{ "route" : "getMaisonVmcMode", "result" : "'.$_result.'" }';
 }
 
@@ -17,11 +23,20 @@ function putMaisonVmcMode($params) {
 		http_response_code(422);
 		exit;
 	}
-	$_result=exec('/usr/bin/python /var/www/handlers/airflow_set.py '.$_conversion_table[$params['mode']]);
+	$_result=exec($_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/mode/put '.$_conversion_table[$params['mode']]);
 	header('Content-Type: application/json');
 	echo '{ "route" : "putMaisonVmcMode", "result" : "'.$_result.'" }';
 }
 
+function putMaisonNotifSms($params) {
+	include($_SERVER['DOCUMENT_ROOT'].'/../handlers/notif/sms/'.getConf('','notif_sms_provider').'.php');
+	notifSms($params);
+}
+
+function putMaisonNotifMail($params) {
+	include($_SERVER['DOCUMENT_ROOT'].'/../handlers/notif/mail/'.getConf('','notif_mail_provider').'.php');
+	notifMail($params);
+}
 
 error_reporting(E_ALL);
 error_log('on y va');
