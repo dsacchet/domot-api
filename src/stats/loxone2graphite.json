@@ -1,0 +1,276 @@
+{
+  "global": {
+    "pidfile": "/var/run/domot-api.pid",
+    "receiver": {
+      "ip": "192.168.3.254",
+      "port": 1234
+    },
+    "graphite": {
+      "method": "pickle",
+      "flush_interval": 60,
+      "endpoint": {
+        "ip": "127.0.0.1",
+        "port": 2004
+      }
+    },
+    "log": {
+      "level": "info",
+      "method": "syslog",
+      "options": {
+        "facility": "daemon"
+      }
+    }
+  },
+  "metrics": {
+    "mapping": [
+      {
+        "source": "Puissance Baie Info",
+        "destination": "compteurs.electricite.puissance.ec1,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Puissance VMC",
+        "destination": "compteurs.electricite.puissance.ec2,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Puissance Chaudière",
+        "destination": "compteurs.electricite.puissance.ec3,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Puissance TI",
+        "destination": "compteurs.electricite.puissance.ti,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Tension Baie Info",
+        "destination": "compteurs.electricite.tension.ec1,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Tension VMC",
+        "destination": "compteurs.electricite.tension.ec2,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Tension Chaudière",
+        "destination": "compteurs.electricite.tension.ec3,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Tension TI",
+        "destination": "compteurs.electricite.tension.ti,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Intensite Baie Info",
+        "destination": "compteurs.electricite.intensite.ec1,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Intensité VMC",
+        "destination": "compteurs.electricite.intensite.ec2,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Intensité chaudière",
+        "destination": "compteurs.electricite.intensite.ec3,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Intensité TI",
+        "destination": "compteurs.electricite.intensite.ti,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Energie Baie Info",
+        "destination": "compteurs.electricite.energie.ec1,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Energie VMC",
+        "destination": "compteurs.electricite.energie.ec2,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Energie Chaudière",
+        "destination": "compteurs.electricite.energie.ec3,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "Energie TI",
+        "destination": "compteurs.electricite.energie.ti,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.0.1.Vent",
+        "destination": "compteurs.station_meteo.vent,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.0.2.Température",
+        "destination": "compteurs.station_meteo.temperature,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.0.4.Luminosité",
+        "destination": "compteurs.station_meteo.luminosite,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.0.5.Azimut soleil",
+        "destination": "compteurs.station_meteo.azimut_soleil,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.0.6.Elevation soleil",
+        "destination": "compteurs.station_meteo.elevation_soleil,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.0.7.Direction vent",
+        "destination": "compteurs.station_meteo.direction_vent,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.2.0.Luminosite C1",
+        "destination": "compteurs.station_meteo.luminosite_c1,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.2.1.Luminosite C2",
+        "destination": "compteurs.station_meteo.luminosite_c2,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.2.2.Luminosite C3",
+        "destination": "compteurs.station_meteo.luminosite_c3,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.2.3.Luminosite C4",
+        "destination": "compteurs.station_meteo.luminosite_c4,",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      },
+      {
+        "source": "SM.5.2.10.Rayonnement global",
+        "destination": "compteurs.station_meteo.rayonnement_global",
+        "aggregation": [
+          "min",
+          "max",
+          "avg"
+        ]
+      }
+    ],
+    "persist": {
+      "max_age": 600,
+      "file": "/var/cache/domot-api/last_values"
+    }
+  }
+}
+

@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "description": "configuration file for loxone2graphite daemon",
+  "type": "object",
+  "required": [
+    "global",
+    "metrics"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "global": {
+      "type": "object",
+      "required": [
+        "receiver",
+        "graphite",
+        "log"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pidfile": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "object",
+          "$ref": "#/definitions/socket"
+        },
+        "graphite": {
+          "type": "object",
+          "required": [
+            "method",
+            "flush_interval",
+            "endpoint"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "method": {
+              "enum": [
+                "pickle"
+              ]
+            },
+            "flush_interval": {
+              "type": "integer",
+              "minimum": 60
+            },
+            "endpoint": {
+              "type": "object",
+              "$ref": "#/definitions/socket"
+            }
+          }
+        },
+        "log": {
+          "type": "object",
+          "required": [
+            "level",
+            "method",
+            "options"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "enum": [
+                "emerg",
+                "alert",
+                "crit",
+                "err",
+                "warning",
+                "notice",
+                "info",
+                "debug"
+              ]
+            },
+            "method": {
+              "enum": [
+                "syslog"
+              ]
+            },
+            "options": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "facility": {
+                  "enum": [
+                    "auth",
+                    "authpriv",
+                    "cron",
+                    "daemon",
+                    "ftp",
+                    "kern",
+                    "local0",
+                    "local1",
+                    "local2",
+                    "local3",
+                    "local4",
+                    "local5",
+                    "local6",
+                    "local7",
+                    "lpr",
+                    "mail",
+                    "news",
+                    "syslog",
+                    "user",
+                    "uucp"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "mapping",
+        "persist"
+      ],
+      "properties": {
+        "mapping": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mapping"
+          }
+        },
+        "persist": {
+          "type": "object",
+          "required": [
+            "max_age",
+            "file"
+          ],
+          "properties": {
+            "max_age": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "file": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "socket": {
+      "required": [
+        "ip",
+        "port"
+      ],
+      "properties": {
+        "ip": {
+          "type": "string",
+          "format": "ipv4"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      },
+      "additionalProperties": false
+    },
+    "mapping": {
+      "required": [
+        "source",
+        "destination"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "string"
+        },
+        "aggregation": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "avg",
+              "min",
+              "max"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
