@@ -1,6 +1,12 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+"""
+loxone2graphite.py : listen on an UDP socket for message from a loxone
+                     miniserver convert data and send them back to a
+                     carbon relay every n seconds
+"""
+
 import socket
 import sys
 import struct
@@ -99,39 +105,41 @@ class Publisher(Thread):
 
 def main():
 
-  parser = OptionParser()
-  parser.add_option("-D", "--daemon", action="store_true", dest="daemon", default="False", help="Daemonize the process")
-  parser.add_option("-c", "--conf", action="store", dest="conffile", default="/etc/domot-api/loxone2graphite.json", help="Specify a configuration file")
-  (options,args) = parser.parse_args()
+    parser = OptionParser()
+    parser.add_option("-D", "--daemon", action="store_true", dest="daemon", default="False", help="Daemonize the process")
+    parser.add_option("-c", "--conf", action="store", dest="conffile", default="/etc/domot-api/loxone2graphite.json", help="Specify a configuration file")
+    (options,args) = parser.parse_args()
 
-  try:
-    fp=open(options.conffile,"r")
-    configuration=json.load(fp)
-    fp.close()
-  except IOError as e:
-    print('Impossible de lire le fichier de configuration ',options.conffile,' : ',e.strerror)
-    exit(1)
-  
-  try:
-    fp=open("loxone2graphite.schema","r")
-    schema=json.load(fp)
-    fp.close()
-  except IOError as e:
-    print('Impossible de lire le fichier de schema : ',e.strerror)
-    exit(1)
-  
-  try:
-    jsonschema.validate(configuration,schema)
-  except jsonschema.exceptions.ValidationError as e:
-    print('La configuration est invalide : ',e)
-    exit(1)
+    try:
+        fp=open(options.conffile,"r")
+        configuration=json.load(fp)
+        fp.close()
+    except IOError as e:
+        print('Impossible de lire le fichier de configuration ',options.conffile,' : ',e.strerror)
+        exit(1)
+    
+    try:
+        fp=open("loxone2graphite.schema","r")
+        schema=json.load(fp)
+        fp.close()
+    except IOError as e:
+        print('Impossible de lire le fichier de schema : ',e.strerror)
+        exit(1)
+    
+    try:
+        jsonschema.validate(configuration,schema)
+    except jsonschema.exceptions.ValidationError as e:
+        print('La configuration est invalide : ',e)
+        exit(1)
 
-  receiver = Receiver()
-  publisher = Publisher()
-  receiver.start()
-  publisher.start()
-  receiver.join()
-  publisher.join()
+    receiver = Receiver()
+    publisher = Publisher()
+    receiver.start()
+    publisher.start()
+    receiver.join()
+    publisher.join()
 
 if __name__ == "__main__":
-  main()
+    main()
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
