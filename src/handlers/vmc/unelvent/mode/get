@@ -13,7 +13,7 @@ instrument.serial.stopbits = 1
 
 try:
     result = instrument.read_register(15,0,3,False)
-    print('{ "airflow_mode": "{}", "airflow_readable": "{}" }'.format(result,value[result]))
+    print('{ "airflow_mode": "%s", "airflow_readable": "%s" }'%(result,value[result]))
 except ValueError as e:
     print('{ "error": "%s" }'%(e))
 except TypeError as e:
