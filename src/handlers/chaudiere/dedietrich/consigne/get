@@ -1,0 +1,66 @@
+#!/usr/bin/python
+
+# https://minimalmodbus.readthedocs.io/en/master/apiminimalmodbus.html
+import minimalmodbus
+import sys
+import time
+
+# valeur qu'il est possible de modifier avec les valeurs limites
+mapping={
+  'jour': {
+    'address': 14,
+    'minimum': 5.0,
+    'maximum': 30.0
+  },
+  'nuit': {
+    'address': 15,
+    'minimum': 5.0,
+    'maximum': 30.0
+  },
+  'antigel': {
+    'address': 16,
+    'minimum': 0.5,
+    'maximum': 20.0
+  }
+}
+
+# connexion a la chaudiere
+minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=True
+instrument = minimalmodbus.Instrument('/dev/ttyBOILER1',0xA,mode='rtu')
+instrument.serial.baudrate = 9600
+instrument.serial.bytesize = 8
+instrument.serial.parity = 'N'
+instrument.serial.stopbits = 1
+instrument.serial.timeout = 1
+
+# affichage de l'aide
+def usage(message = ''):
+  print "Usage : ",sys.argv[0]," <jour|nuit|antigel>"
+  if not message == '':
+    print message
+
+# lecture d'une valeur
+def read_temperature(plage):
+  global mapping
+  while True:
+    try:
+      result = instrument.read_register(mapping[plage]['address'],1)
+    except ValueError, IOError:
+      time.sleep(1)
+      continue
+    break
+  return result
+
+# programme principal
+if len(sys.argv) == 2:
+  plage=sys.argv[1]
+  if not plage in mapping:
+    usage()
+    exit(1)
+  currentvalue = read_temperature(plage)
+  print currentvalue
+else:
+  usage()
+  exit(1)
+
+exit(0)

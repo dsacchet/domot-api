@@ -11,9 +11,28 @@ function postMaisonMetrics($params) {
 	error_log(serialize($params));
 }
 
+function getMaisonChaudiereConsigneJour($params) {
+    $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/chaudiere/'.getConf('','chaudiere_provider').'/consigne/get jour';
+	$_result=exec($command, $retArr, $retVal);
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
+}
+
+function putMaisonChaudiereConsigneJour($params) {
+	if(array_key_exists('temperature',$params) === FALSE) {
+		echo '{ "errorMessage" : "You must give a parameter temperature" }';
+		http_response_code(422);
+		exit;
+	}
+    $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/chaudiere/'.getConf('','chaudiere_provider').'/consigne/put jour '.$params['temperature'];
+	$_result=exec($command,$retArr, $retVal);
+	header('Content-Type: application/json');
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
+}
+
 function getMaisonVmcMode($params) {
-	$_result=exec($_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.$vmc_provider.'/mode/get');
-	echo '{ "route" : "getMaisonVmcMode", "result" : "'.$_result.'" }';
+    $commmand=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.$vmc_provider.'/mode/get';
+	$_result=exec($command, $retArr, $retVal);
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
 }
 
 function putMaisonVmcMode($params) {
@@ -23,9 +42,10 @@ function putMaisonVmcMode($params) {
 		http_response_code(422);
 		exit;
 	}
-	$_result=exec($_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/mode/put '.$_conversion_table[$params['mode']]);
+	$command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/mode/put '.$_conversion_table[$params['mode']];
+    $_result=exec($command,$retArr, $retVal);
 	header('Content-Type: application/json');
-	echo '{ "route" : "putMaisonVmcMode", "result" : "'.$_result.'" }';
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
 }
 
 function putMaisonNotifSms($params) {
