@@ -11,14 +11,34 @@ instrument.serial.bytesize = 8
 instrument.serial.parity = 'E'
 instrument.serial.stopbits = 1
 
+def read_value(address):
+  while True:
+    try:
+      result = instrument.read_register(address,0,3,False)
+    except ValueError, IOError:
+      time.sleep(1)
+      continue
+    break
+  return result
+
+def write_value(address,value):
+  while True:
+    try:
+      result = instrument.write_register(address,value)
+    except ValueError, IOError:
+      time.sleep(1)
+      continue
+    break
+  return result
+
 if len(sys.argv) == 2:
   newvalue=int(sys.argv[1])
-  result = instrument.read_register(15,0,3,False)
+  result = read_value(15)
   print "Current setting : ",value[result]
   if newvalue != result:
     print "Change setting to : ",value[newvalue]
-    instrument.write_register(15,newvalue,)
-    result = instrument.read_register(15,0,3,False)
+    write_value(15,newvalue)
+    result = read_value(15)
     print "New setting : ",value[result]
   else:
     print "Same value, nothing to do"
