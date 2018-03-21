@@ -30,7 +30,7 @@ function putMaisonChaudiereConsigneJour($params) {
 }
 
 function getMaisonVmcMode($params) {
-    $commmand=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.$vmc_provider.'/mode/get';
+    $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/mode/get';
 	$_result=exec($command, $retArr, $retVal);
 	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
 }
