@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+import minimalmodbus
+import sys
+
+value=['off','on']
+
+instrument = minimalmodbus.Instrument('/dev/ttyVMC1',0)
+instrument.serial.baudrate = 19200
+instrument.serial.bytesize = 8
+instrument.serial.parity = 'E'
+instrument.serial.stopbits = 1
+
+try:
+    result = instrument.read_bit(9,1)
+    print('{ "bypass_mode": "%s", "bypass_mode_readable": "%s" }'%(result,value[result]))
+except ValueError as e:
+    print('{ "error": "%s" }'%(e))
+except TypeError as e:
+    print('{ "error": "%s" }'%(e))
+except IOError as e:
+    print('{ "error": "%s" }'%(e))
