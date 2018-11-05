@@ -2,6 +2,7 @@
 
 import minimalmodbus
 import sys
+from retrying import retry
 
 value=['low','boost','bypass']
 
@@ -11,12 +12,16 @@ instrument.serial.bytesize = 8
 instrument.serial.parity = 'E'
 instrument.serial.stopbits = 1
 
+@retry(stop_max_delay=900, wait_fixed=50)
+def get_vmc_mode():
+    return instrument.read_register(15,0,3,False)
+    
 try:
-    result = instrument.read_register(15,0,3,False)
+    result=get_vmc_mode()
     print('{ "airflow_mode": "%s", "airflow_readable": "%s" }'%(result,value[result]))
 except ValueError as e:
-    print('{ "error": "%s" }'%(e))
+    print('{ "airflow_mode": "-", "airflow_readable": "unknown", "error": "%s" }'%(e))
 except TypeError as e:
-    print('{ "error": "%s" }'%(e))
+    print('{ "airflow_mode": "-", "airflow_readable": "unknown", "error": "%s" }'%(e))
 except IOError as e:
-    print('{ "error": "%s" }'%(e))
+    print('{ "airflow_mode": "-", "airflow_readable": "unknown", "error": "%s" }'%(e))

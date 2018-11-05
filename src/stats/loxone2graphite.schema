@@ -12,8 +12,8 @@
       "type": "object",
       "required": [
         "receiver",
-        "graphite",
-        "log"
+        "publisher",
+        "logging"
       ],
       "additionalProperties": false,
       "properties": {
@@ -22,25 +22,38 @@
         },
         "receiver": {
           "type": "object",
-          "$ref": "#/definitions/socket"
+          "required": [
+            "flush_interval",
+            "endpoint"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "flush_interval": {
+              "type":"integer",
+              "minimum":60
+            },
+            "endpoint": {
+              "type": "object",
+               "$ref": "#/definitions/socket"
+            }
+          }
         },
-        "graphite": {
+        "publisher": {
           "type": "object",
           "required": [
             "method",
-            "flush_interval",
             "endpoint"
           ],
           "additionalProperties": false,
           "properties": {
             "method": {
               "enum": [
-                "pickle"
+                "pickle",
+                "plaintext"
               ]
             },
-            "flush_interval": {
-              "type": "integer",
-              "minimum": 60
+            "prefix": {
+              "type": "string"
             },
             "endpoint": {
               "type": "object",
@@ -48,63 +61,8 @@
             }
           }
         },
-        "log": {
-          "type": "object",
-          "required": [
-            "level",
-            "method",
-            "options"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "level": {
-              "enum": [
-                "emerg",
-                "alert",
-                "crit",
-                "err",
-                "warning",
-                "notice",
-                "info",
-                "debug"
-              ]
-            },
-            "method": {
-              "enum": [
-                "syslog"
-              ]
-            },
-            "options": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "facility": {
-                  "enum": [
-                    "auth",
-                    "authpriv",
-                    "cron",
-                    "daemon",
-                    "ftp",
-                    "kern",
-                    "local0",
-                    "local1",
-                    "local2",
-                    "local3",
-                    "local4",
-                    "local5",
-                    "local6",
-                    "local7",
-                    "lpr",
-                    "mail",
-                    "news",
-                    "syslog",
-                    "user",
-                    "uucp"
-                  ]
-                }
-              }
-            }
-          }
+        "logging": {
+          "type": "object"
         }
       }
     },
@@ -177,7 +135,8 @@
             "enum": [
               "avg",
               "min",
-              "max"
+              "max",
+              "last"
             ]
           }
         }

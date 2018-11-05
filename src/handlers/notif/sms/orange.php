@@ -7,7 +7,7 @@ function notifSms($params) {
 
 	/* STEP 1 : Initialize cookie */
 	error_log('curl init cookie with https://id.orange.fr/auth_user/bin/auth_user.cgi');
-	$cookie_file=tempnam('/tmp/','domot_cookie_notif_');
+	$cookie_file=tempnam($_SERVER['DOCUMENT_ROOT'].'/../run/','domot_cookie_notif_');
 	error_log('cookie file : '.$cookie_file);
 	$ch=curl_init('https://id.orange.fr/auth_user/bin/auth_user.cgi');
 	curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
@@ -82,5 +82,5 @@ function notifSms($params) {
 		error_log('curl sendsms result : '.$result);
 	}
 	curl_close($ch);
-	unlink($cookie_file);
+//unlink($cookie_file);
 }

@@ -14,7 +14,7 @@ function postMaisonMetrics($params) {
 function getMaisonChaudiereConsigneJour($params) {
     $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/chaudiere/'.getConf('','chaudiere_provider').'/consigne/get jour';
 	$_result=exec($command, $retArr, $retVal);
-	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : '.$retArr[0].', "debug":"'.$command.'" }';
 }
 
 function putMaisonChaudiereConsigneJour($params) {
@@ -26,16 +26,36 @@ function putMaisonChaudiereConsigneJour($params) {
     $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/chaudiere/'.getConf('','chaudiere_provider').'/consigne/put jour '.$params['temperature'];
 	$_result=exec($command,$retArr, $retVal);
 	header('Content-Type: application/json');
-	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : '.$retArr[0].', "debug":"'.$command.'" }';
+}
+
+function getMaisonVmcBypass($params) {
+    $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/bypass/get';
+	$_result=exec($command, $retArr, $retVal);
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : '.$retArr[0].', "debug":"'.$command.'" }';
+}
+
+function putMaisonVmcBypass($params) {
+	$_conversion_table=array('off' => 0,'on' => 1);
+	if(!array_key_exists('bypass',$params) || array_key_exists($params['bypass'],$_conversion_table) === FALSE) {
+		echo '{ "errorMessage" : "You must give in parameters a value into (off,on) to bypass variable" }';
+		http_response_code(422);
+		exit;
+	}
+	$command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/bypass/put '.$_conversion_table[$params['bypass']];
+    $_result=exec($command,$retArr, $retVal);
+	header('Content-Type: application/json');
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : '.$retArr[0].', "debug":"'.$command.'" }';
 }
 
 function getMaisonVmcMode($params) {
     $command=$_SERVER['DOCUMENT_ROOT'].'/../handlers/vmc/'.getConf('','vmc_provider').'/mode/get';
 	$_result=exec($command, $retArr, $retVal);
-	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : "'.$retArr[0].'", "debug":"'.$command.'" }';
+	echo '{ "route" : "',__FUNCTION__,'", "returnCode": "'.$retVal.'", "result" : '.$retArr[0].', "debug":"'.$command.'" }';
 }
 
 function putMaisonVmcMode($params) {
+    error_log(print_r($params,true));
 	$_conversion_table=array('low' => 0,'boost' => 1, 'bypass' => 2);
 	if(!array_key_exists('mode',$params) || array_key_exists($params['mode'],$_conversion_table) === FALSE) {
 		echo '{ "errorMessage" : "You must give in parameters a value into (low,boost,bypass) to mode variable" }';
@@ -61,7 +81,6 @@ function putMaisonNotifMail($params) {
 error_reporting(E_ALL);
 error_log('on y va');
 
-
 $_request_headers=apache_request_headers();
 
 error_log(serialize($_request_headers));
@@ -76,7 +95,7 @@ if($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] == 'POST')
 		!array_key_exists('Content-Type',$_request_headers) ||
 		strpos($_request_headers['Content-Type'],'application/json') !== 0
 	) {
-error_log(serialize($_request_headers));
+        error_log(serialize($_request_headers));
 		echo '{ "errorMessage" : "Content-Type must be set to application/json" }';
 		http_response_code(400);
 		exit;
@@ -84,12 +103,12 @@ error_log(serialize($_request_headers));
 	$_raw_data = file_get_contents('php://input');
 	$_decoded_data = json_decode($_raw_data,TRUE);
 	if($_decoded_data === NULL) {
-error_log("_decoded_data is NULL");
+        error_log("_decoded_data is NULL");
 		echo '{ "errorMessage" : "Unable to decode JSON data" }';
 		http_response_code(400);
 		exit;
 	}
-error_log(serialize($_decoded_data));
+    error_log(serialize($_decoded_data));
 }
 
 if(function_exists($_route)) {
